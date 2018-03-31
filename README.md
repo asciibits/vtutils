@@ -11,11 +11,13 @@ Specific screen impleentations have been created that are easily composable.
 They include:
 
 * box
+
   creates a virtal terminal of any size hosted within a parent terminal.
   If the sub-terminal does not fit, scrolling is made available via terminal
   escape sequences.
 
 * scroll
+
   Creates a virtual terminal that tracks the scrollbuffer of an existing
   terminal, and provides scrollback and search.
 
