@@ -30,3 +30,15 @@
 *.exe
 *.out
 *.app
+
+# Autoconf generated files
+Makefile
+config.h
+config.log
+config.status
+man/Makefile
+src/.deps/
+src/Makefile
+src/test
+stamp-h1
+
