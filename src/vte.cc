@@ -1,4 +1,4 @@
-#include "scroll.h"
+#include "vte.h"
 
 #include <iostream>
 

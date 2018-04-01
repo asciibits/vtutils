@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
-#include "scroll.h"
+#include "vte.h"
 
 using namespace std;
 
