@@ -2,8 +2,9 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT(vtutils, 0.1, [])
+AC_INIT(vtutils, 0.1)
 AC_CONFIG_SRCDIR([src/vte.cc])
+AM_INIT_AUTOMAKE
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
@@ -11,6 +12,7 @@ AC_PROG_CXX
 AC_PROG_CC
 
 # Checks for libraries.
+AC_PROG_RANLIB
 
 # Checks for header files.
 
@@ -23,5 +25,5 @@ AC_CONFIG_FILES([Makefile
                  man/Makefile
                  src/Makefile])
 
-AM_INIT_AUTOMAKE()
+AC_OUTPUT
 

@@ -1,10 +1,10 @@
 ## Process this file with automake to produce Makefile.in
 
-CFLAGS = -std=c++11 -Wall -g
-CC = clang++
+AM_CXXFLAGS = -std=c++11 -Wall -g
+CXX = clang++
 
-lib_LIBRARIES = vte
-vte_SOURCES = vte.cc
+lib_LIBRARIES = libvte.a
+libvte_a_SOURCES = vte.cc
 
 bin_PROGRAMS = test
 test_SOURCES = test.cc vte.cc
