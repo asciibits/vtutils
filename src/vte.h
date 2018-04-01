@@ -67,8 +67,8 @@ class Vte {
 //  tsm_vte_charset *g3;
 //
 //  struct vte_saved_state saved_state;
-  unsigned int alt_cursor_x;
-  unsigned int alt_cursor_y;
+//  unsigned int alt_cursor_x;
+//  unsigned int alt_cursor_y;
 
   void parse_data(uint32_t raw);
 };
