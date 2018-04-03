@@ -40,7 +40,7 @@ aclocal*
 src/.deps/
 src/test
 stamp-h1
-autom4te.cache
+autom4te.cache/
 compile
 depcomp
 install-sh
