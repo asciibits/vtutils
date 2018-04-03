@@ -55,6 +55,21 @@ enum ParserAction {
   ACTION_OSC_COLLECT,  // collect OSC data
   ACTION_OSC_END,      // end of OSC data
 };
+
+// max CSI arguments
+const int CSI_ARG_MAX = 16;
+
+// Saved state
+struct saved_state {
+  unsigned int cursor_x;
+  unsigned int cursor_y;
+  screen::Attr attr;
+  charsets::charset *gl;
+  charsets::charset *gr;
+  bool wrap_mode;
+  bool origin_mode;
+};
+
 }
 
 // The Virtual Terminal Emulator. This class was ported from the C code at the libtsm project
@@ -69,8 +84,10 @@ class Vte {
   }
 
   void input(char c);
+  void input(std::string s);
   
   void reset();
+  void hard_reset();
 
  private:
   screen::Screen &_screen;
@@ -88,13 +105,12 @@ class Vte {
 //  void *data;
 //  char *palette_name;
 //
-//  struct tsm_utf8_mach *mach;
-//  unsigned long parse_cnt;
-//
-//  unsigned int csi_argc;
-//  int csi_argv[CSI_ARG_MAX];
-//  unsigned int csi_flags;
-//
+  unsigned int _parse_cnt = 0;
+
+  unsigned int _csi_argc;
+  int _csi_argv[CSI_ARG_MAX];
+  unsigned int _csi_flags;
+
 //  uint8_t (*palette)[3];
   screen::Attr _attr;
 
@@ -112,16 +128,41 @@ class Vte {
   charsets::charset *_g2;
   charsets::charset *_g3;
 
-//  struct vte_saved_state saved_state;
-//  unsigned int alt_cursor_x;
-//  unsigned int alt_cursor_y;
+  struct saved_state _saved_state;
+  unsigned int _alt_cursor_x;
+  unsigned int _alt_cursor_y;
 
   void parse_data(char32_t raw);
   void do_trans(char32_t data, ParserState state, ParserAction act);
   void do_action(char32_t data, ParserAction action);
+  void do_execute(char32_t ctrl);
   char32_t map_char(char32_t val);
   void write_console(char32_t sym);
+  void write(const std::string u8);
+  void send_primary_da();
+  void do_clear();
+  void do_collect(char32_t data);
+  void do_param(char32_t data);
+  void do_esc(char32_t data);
+  bool set_charset(charsets::charset *set);
   void reset_state();
+  void save_state();
+  void restore_state();
+  void do_csi(char32_t data);
+  void csi_attribute();
+  void csi_soft_reset();
+  void csi_compat_mode();
+  void csi_mode(bool set);
+  void csi_dev_attr();
+  void csi_dsr();
+  
+  inline void set_reset_flag(bool set, unsigned int flag) {
+    if (set) {
+      _flags |= flag;
+    } else {
+      _flags &= ~flag;
+    }
+  }
 };
 
 // Provide input-stream handling

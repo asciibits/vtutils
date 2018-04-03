@@ -1,20 +1,23 @@
 #ifndef VTUTILS_SCREEN_H_
 #define VTUTILS_SCREEN_H_
 
+#include <ostream>
+
 // A Screen abstraction for the terminal emulation library.
 namespace vtutils {
 namespace screen {
   
-static const unsigned int SCREEN_INSERT_MODE = 0x01;
-static const unsigned int SCREEN_AUTO_WRAP   = 0x02;
-static const unsigned int SCREEN_REL_ORIGIN  = 0x04;
-static const unsigned int SCREEN_INVERSE     = 0x08;
-static const unsigned int SCREEN_HIDE_CURSOR = 0x10;
-static const unsigned int SCREEN_FIXED_POS   = 0x20;
-static const unsigned int SCREEN_ALTERNATE   = 0x40;
+static const unsigned int SCREEN_INSERT_MODE      = 0x01;
+static const unsigned int SCREEN_AUTO_WRAP        = 0x02;
+static const unsigned int SCREEN_REL_ORIGIN       = 0x04;
+static const unsigned int SCREEN_INVERSE           = 0x08;
+static const unsigned int SCREEN_HIDE_CURSOR      = 0x10;
+static const unsigned int SCREEN_FIXED_POS         = 0x20;
+static const unsigned int SCREEN_ALTERNATE         = 0x40;
+static const unsigned int SCREEN_SMOOTH_SCROLLING = 0x80;
 
-enum ColorCode : uint8_t {
-  COLOR_RGB, // indicates use RGB value
+enum ColorCode : int8_t {
+  COLOR_RGB = -1, // indicates use RGB value
   COLOR_BLACK,
   COLOR_RED,
   COLOR_GREEN,
@@ -51,6 +54,9 @@ struct Attr {
   bool blink : 1;
 };
 
+std::ostream& operator<<(std::ostream &out, const Color &color);
+std::ostream& operator<<(std::ostream &out, const Attr &attr);
+
 // A virtual "screen", used by the virtual terminal emulator to issue the required "drawing"
 // commands.
 class Screen {
@@ -58,16 +64,54 @@ class Screen {
   virtual ~Screen() = default;
 
   virtual void reset() = 0;
+  virtual void hard_reset() = 0;
+  
   virtual void set_flags(unsigned int flags) = 0;
+  virtual void reset_flags(unsigned int flags) = 0;
+  
   virtual void write(char32_t sym, Attr *attr) = 0;
+  virtual void newline() = 0;
+  virtual void insert_lines(unsigned int num) = 0;
+  virtual void delete_lines(unsigned int num) = 0;
+  virtual void insert_chars(unsigned int num) = 0;
+  virtual void delete_chars(unsigned int num) = 0;
+  // system bell
+  virtual void alert() = 0;
+  
   virtual Attr default_attr() = 0;
+  virtual void set_def_attr(screen::Attr attr) = 0;
+  
+  virtual void move_left(unsigned int num) = 0;
+  virtual void move_right(unsigned int num) = 0;
+  virtual void move_to(unsigned int x, unsigned int y) = 0;
+  virtual void move_up(unsigned int num, bool scroll) = 0;
+  virtual void move_down(unsigned int num, bool scroll) = 0;
+  virtual void move_line_home() = 0;
+  
+  virtual void scroll_up(unsigned int num) = 0;
+  virtual void scroll_down(unsigned int num) = 0;
+  
+  virtual void set_tabstop() = 0;
+  virtual void reset_tabstop() = 0;
+  virtual void reset_all_tabstops() = 0;
+  virtual void tab_right(unsigned int num) = 0;
+  virtual void tab_left(unsigned int num) = 0;
+  
+  virtual unsigned int get_cursor_x() = 0;
+  virtual unsigned int get_cursor_y() = 0;
 
-  // resize this screen to the given height and width
-  virtual void resize() = 0;
+  virtual void erase_screen(bool protect) = 0;
+  virtual void erase_cursor_to_screen(bool protect) = 0;
+  virtual void erase_screen_to_cursor(bool protect) = 0;
+  virtual void erase_cursor_to_end(bool protect) = 0;
+  virtual void erase_home_to_cursor(bool protect) = 0;
+  virtual void erase_current_line(bool protect) = 0;
+  virtual void erase_chars(unsigned int num) = 0;
+  
+  virtual void set_margins(unsigned int top, unsigned int bottom) = 0;
 };
 
 } // namespace screen
 } // namespace vtutils
 
 #endif /* VTUTILS_SCREEN_H_ */
-

@@ -124,14 +124,18 @@ AM_V_AR = $(am__v_AR_@AM_V@)
 am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
+libdebugscreen_a_AR = $(AR) $(ARFLAGS)
+libdebugscreen_a_LIBADD =
+am_libdebugscreen_a_OBJECTS = debug_screen.$(OBJEXT) screen.$(OBJEXT)
+libdebugscreen_a_OBJECTS = $(am_libdebugscreen_a_OBJECTS)
 libvte_a_AR = $(AR) $(ARFLAGS)
 libvte_a_LIBADD =
-am_libvte_a_OBJECTS = vte.$(OBJEXT) unicode.$(OBJEXT)
+am_libvte_a_OBJECTS = vte.$(OBJEXT) screen.$(OBJEXT) unicode.$(OBJEXT)
 libvte_a_OBJECTS = $(am_libvte_a_OBJECTS)
 PROGRAMS = $(bin_PROGRAMS)
 am_test_OBJECTS = test.$(OBJEXT)
 test_OBJECTS = $(am_test_OBJECTS)
-test_DEPENDENCIES = libvte.a
+test_DEPENDENCIES = libvte.a libdebugscreen.a
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -161,8 +165,10 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(libvte_a_SOURCES) $(test_SOURCES)
-DIST_SOURCES = $(libvte_a_SOURCES) $(test_SOURCES)
+SOURCES = $(libdebugscreen_a_SOURCES) $(libvte_a_SOURCES) \
+	$(test_SOURCES)
+DIST_SOURCES = $(libdebugscreen_a_SOURCES) $(libvte_a_SOURCES) \
+	$(test_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -283,10 +289,11 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CXXFLAGS = -std=c++11 -g -Wall -W -Wall -Wformat -pedantic -Wpointer-arith -Wwrite-strings -Wno-long-long
 # CXX = g++
-lib_LIBRARIES = libvte.a
-libvte_a_SOURCES = vte.cc unicode.cc
+lib_LIBRARIES = libvte.a libdebugscreen.a
+libvte_a_SOURCES = vte.cc screen.cc unicode.cc
+libdebugscreen_a_SOURCES = debug_screen.cc screen.cc
 test_SOURCES = test.cc
-test_LDADD = libvte.a
+test_LDADD = libvte.a libdebugscreen.a
 all: all-am
 
 .SUFFIXES:
@@ -353,6 +360,11 @@ uninstall-libLIBRARIES:
 clean-libLIBRARIES:
 	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
 
+libdebugscreen.a: $(libdebugscreen_a_OBJECTS) $(libdebugscreen_a_DEPENDENCIES) $(EXTRA_libdebugscreen_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libdebugscreen.a
+	$(AM_V_AR)$(libdebugscreen_a_AR) libdebugscreen.a $(libdebugscreen_a_OBJECTS) $(libdebugscreen_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libdebugscreen.a
+
 libvte.a: $(libvte_a_OBJECTS) $(libvte_a_DEPENDENCIES) $(EXTRA_libvte_a_DEPENDENCIES) 
 	$(AM_V_at)-rm -f libvte.a
 	$(AM_V_AR)$(libvte_a_AR) libvte.a $(libvte_a_OBJECTS) $(libvte_a_LIBADD)
@@ -410,6 +422,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug_screen.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/screen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unicode.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vte.Po@am__quote@
