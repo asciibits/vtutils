@@ -38,7 +38,6 @@ aclocal*
 !Makefile.am
 !configure.ac
 .deps
-src/test
 stamp-h1
 autom4te.cache/
 compile
