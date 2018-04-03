@@ -287,7 +287,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CXXFLAGS = -std=c++11 -g -Wall -W -Wall -Wformat -pedantic -Wpointer-arith -Wwrite-strings -Wno-long-long
+AM_CXXFLAGS = -std=c++11 -g -Wall -W -Wall -Wformat -pedantic -Wpointer-arith -Wwrite-strings -Wno-long-long -Wno-gnu-zero-variadic-macro-arguments
 # CXX = g++
 lib_LIBRARIES = libvte.a libdebugscreen.a
 libvte_a_SOURCES = vte.cc screen.cc unicode.cc

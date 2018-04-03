@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-AM_CXXFLAGS = -std=c++11 -g -Wall -W -Wall -Wformat -pedantic -Wpointer-arith -Wwrite-strings -Wno-long-long
+AM_CXXFLAGS = -std=c++11 -g -Wall -W -Wall -Wformat -pedantic -Wpointer-arith -Wwrite-strings -Wno-long-long -Wno-gnu-zero-variadic-macro-arguments
 #AM_LDFLAGS = -licui18n -licuuc -licudata
 CXX = clang++
 # CXX = g++

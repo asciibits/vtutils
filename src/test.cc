@@ -13,7 +13,6 @@ void log(
     string file,
     int line,
     string func,
-    unsigned int sev,
     string format,
     va_list args) {
   

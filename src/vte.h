@@ -21,11 +21,9 @@ namespace {
 /**
  * Logging Callback
  *
- * @data: user-provided data
  * @file: Source code file where the log message originated or NULL
  * @line: Line number in source code or 0
  * @func: C function name or NULL
- * @subs: Subsystem where the message came from or NULL
  * @sev: Kernel-style severity between 0=FATAL and 7=DEBUG
  * @format: printf-formatted message
  * @args: arguments for printf-style @format
@@ -37,7 +35,6 @@ typedef void (*log_cb) (
     std::string file,
     int line,
     std::string func,
-    unsigned int sev,
     std::string format,
     va_list args);
 
@@ -46,13 +43,12 @@ void log_format(log_cb logger,
         std::string file,
         int line,
         std::string func,
-        unsigned int sev,
         std::string format,
         ...) {
   va_list list;
   if (logger) {
     va_start(list, format);
-    logger(file, line, func, sev, format, list);
+    logger(file, line, func, format, list);
     va_end(list);
   }
 }
@@ -62,7 +58,6 @@ void log_format(log_cb logger,
 #define log_printf(obj, format, ...) \
     log_format((obj)->_logger, \
             LOG_DEFAULT, \
-            1, \
             (format), \
             ##__VA_ARGS__)
 
