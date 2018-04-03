@@ -32,8 +32,9 @@
 *.app
 
 # Autoconf generated files
-Makefile.*
+Makefile*
 config*
+aclocal*
 !Makefile.am
 !configure.ac
 src/.deps/

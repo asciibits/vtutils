@@ -21,3 +21,11 @@ They include:
   Creates a virtual terminal that tracks the scrollbuffer of an existing
   terminal, and provides scrollback and search.
 
+## Build
+
+To build:
+
+```
+./autogen.sh && ./configure && make
+```
+
