@@ -126,12 +126,12 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 libvte_a_AR = $(AR) $(ARFLAGS)
 libvte_a_LIBADD =
-am_libvte_a_OBJECTS = vte.$(OBJEXT)
+am_libvte_a_OBJECTS = vte.$(OBJEXT) unicode.$(OBJEXT)
 libvte_a_OBJECTS = $(am_libvte_a_OBJECTS)
 PROGRAMS = $(bin_PROGRAMS)
-am_test_OBJECTS = test.$(OBJEXT) vte.$(OBJEXT)
+am_test_OBJECTS = test.$(OBJEXT)
 test_OBJECTS = $(am_test_OBJECTS)
-test_LDADD = $(LDADD)
+test_DEPENDENCIES = libvte.a
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -200,6 +200,7 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+#AM_LDFLAGS = -licui18n -licuuc -licudata
 CXX = clang++
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
@@ -280,10 +281,12 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CXXFLAGS = -std=c++11 -Wall -g
+AM_CXXFLAGS = -std=c++11 -g -Wall -W -Wall -Wformat -pedantic -Wpointer-arith -Wwrite-strings -Wno-long-long
+# CXX = g++
 lib_LIBRARIES = libvte.a
-libvte_a_SOURCES = vte.cc
-test_SOURCES = test.cc vte.cc
+libvte_a_SOURCES = vte.cc unicode.cc
+test_SOURCES = test.cc
+test_LDADD = libvte.a
 all: all-am
 
 .SUFFIXES:
@@ -297,9 +300,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/Makefile
+	  $(AUTOMAKE) --gnu src/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -408,6 +411,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unicode.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vte.Po@am__quote@
 
 .cc.o:

@@ -42,3 +42,6 @@ src/Makefile
 src/test
 stamp-h1
 
+# IDE files
+nbproject/
+
