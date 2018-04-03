@@ -1675,5 +1675,13 @@ void Vte::restore_state() {
   }
 }
 
+void Vte::set_reset_flag(bool set, unsigned int flag) {
+  if (set) {
+    _flags |= flag;
+  } else {
+    _flags &= ~flag;
+  }
+}
+
 } // namespace vte
 } // namespace vtutils

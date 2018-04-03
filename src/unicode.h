@@ -44,9 +44,9 @@ enum utf8_parse_state {
 class Utf8To32Converter {
 public:
   // Push a utf-8 char. If the char completes a Unicode code point, then the
-  // code point is written to code_point, and the method returns true. If the
+  // code point is copied to code_point, and the method returns true. If the
   // char makes an invalid UTF-8 stream, then the replacement character (\ufffd)
-  // is written to code_point and the method returns true, and the state machine
+  // is written to code_point, the method returns true, and the state machine
   // is reset. If the char starts or continues a valid UTF-8 sequence, but does
   // not complete it, then nothing is written to code_point, and false is
   // returned.

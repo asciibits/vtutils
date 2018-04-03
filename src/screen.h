@@ -83,9 +83,9 @@ class Screen {
   
   virtual void move_left(unsigned int num) = 0;
   virtual void move_right(unsigned int num) = 0;
-  virtual void move_to(unsigned int x, unsigned int y) = 0;
   virtual void move_up(unsigned int num, bool scroll) = 0;
   virtual void move_down(unsigned int num, bool scroll) = 0;
+  virtual void move_to(unsigned int x, unsigned int y) = 0;
   virtual void move_line_home() = 0;
   
   virtual void scroll_up(unsigned int num) = 0;

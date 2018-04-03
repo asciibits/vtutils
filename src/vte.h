@@ -83,13 +83,13 @@ enum ParserState {
 
 // Input parser actions
 enum ParserAction {
-  ACTION_NONE,          // placeholder
-  ACTION_IGNORE,        // ignore the character entirely
-  ACTION_PRINT,         // print the character on the console
-  ACTION_EXECUTE,       // execute single control character (C0/C1)
-  ACTION_CLEAR,         // clear current parameter state
-  ACTION_COLLECT,       // collect intermediate character
-  ACTION_PARAM,         // collect parameter character
+  ACTION_NONE,         // placeholder
+  ACTION_IGNORE,       // ignore the character entirely
+  ACTION_PRINT,        // print the character on the console
+  ACTION_EXECUTE,      // execute single control character (C0/C1)
+  ACTION_CLEAR,        // clear current parameter state
+  ACTION_COLLECT,      // collect intermediate character
+  ACTION_PARAM,        // collect parameter character
   ACTION_ESC_DISPATCH, // dispatch escape sequence
   ACTION_CSI_DISPATCH, // dispatch csi sequence
   ACTION_DCS_START,    // start of DCS data
@@ -120,7 +120,6 @@ struct saved_state {
 // ( https://www.freedesktop.org/wiki/Software/kmscon/libtsm/ )
 // This is a state machine that processes terminal escape sequences, and translates them into
 // standardized calls to Screen.
-
 class Vte {
  public:
   Vte(screen::Screen &s, log_cb l) : _screen(s), _logger(l) {
@@ -128,80 +127,89 @@ class Vte {
   }
   Vte(screen::Screen &s): Vte(s, nullptr) { };
 
+  // Handle a single character. Handles unicode and bit-size enforcement. Logic
+  // pushed to parse_data
   void input(char c);
+  // convenience wrapper around input above
   void input(std::string s);
-  
+
+  // reset this terminal
   void reset();
+  // hard reset. Similar to reset, but goes even farther to ensure the full
+  // state is clear
   void hard_reset();
 
  private:
+  // initialized state
   screen::Screen &_screen;
+  log_cb _logger;
+  //tsm_vte_write_cb write_cb;
   
+  // state machine state
   unsigned int _flags;
   ParserState _state;
-  vtutils::unicode::Utf8To32Converter _utf8_converter;
-
-  log_cb _logger;
-//  tsm_vte_write_cb write_cb;
-
-  unsigned int _parse_cnt = 0;
-
   unsigned int _csi_argc;
   int _csi_argv[CSI_ARG_MAX];
   unsigned int _csi_flags;
+  unsigned int _parse_cnt = 0;
 
-//  uint8_t (*palette)[3];
+  // UTF-8 state machine
+  vtutils::unicode::Utf8To32Converter _utf8_converter;
+
+  //
+  // Fields below are used with direct interactions with _screen
+  //
+
   screen::Attr _attr;
-
-  // The two primary character sets
+  // The two active character sets
   charsets::charset *_gl;
   charsets::charset *_gr;
-  
   // Temp charsets. Used for next character only
   charsets::charset *_glt;
   charsets::charset *_grt;
-
-  // The four available charsets for this terminal
+  // The four loaded charsets for this terminal
   charsets::charset *_g0;
   charsets::charset *_g1;
   charsets::charset *_g2;
   charsets::charset *_g3;
-
+  // screen state
   struct saved_state _saved_state;
   unsigned int _alt_cursor_x;
   unsigned int _alt_cursor_y;
 
+  // Entry for all parsing
   void parse_data(char32_t raw);
+
+  // private implementation details
   void do_trans(char32_t data, ParserState state, ParserAction act);
   void do_action(char32_t data, ParserAction action);
   void do_execute(char32_t ctrl);
-  char32_t map_char(char32_t val);
-  void write_console(char32_t sym);
-  void write(const std::string u8);
-  void send_primary_da();
   void do_clear();
   void do_collect(char32_t data);
   void do_param(char32_t data);
   void do_esc(char32_t data);
-  bool set_charset(charsets::charset *set);
-  void reset_state();
-  void save_state();
-  void restore_state();
   void do_csi(char32_t data);
+
+  // Redirection Interactions (Terminal invoking commands on terminal)
+  void write_console(char32_t sym);
+  void write(const std::string u8);
+  void send_primary_da();
+  bool set_charset(charsets::charset *set);
+  char32_t map_char(char32_t val);
+  void set_reset_flag(bool set, unsigned int flag);
+
+  // CSI implementation
   void csi_attribute();
   void csi_soft_reset();
   void csi_compat_mode();
   void csi_mode(bool set);
   void csi_dev_attr();
   void csi_dsr();
-  
-  inline void set_reset_flag(bool set, unsigned int flag) {
-    if (set) {
-      _flags |= flag;
-    } else {
-      _flags &= ~flag;
-    }
-  }
+
+  // screen state handling
+  void reset_state();
+  void save_state();
+  void restore_state();
 };
 
 // Provide input-stream handling
