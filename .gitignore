@@ -32,15 +32,18 @@
 *.app
 
 # Autoconf generated files
-Makefile
-config.h
-config.log
-config.status
-man/Makefile
+Makefile.*
+config*
+!Makefile.am
+!configure.ac
 src/.deps/
-src/Makefile
 src/test
 stamp-h1
+autom4te.cache
+compile
+depcomp
+install-sh
+missing
 
 # IDE files
 nbproject/
