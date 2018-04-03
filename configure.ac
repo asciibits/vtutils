@@ -4,7 +4,7 @@
 AC_PREREQ([2.69])
 AC_INIT(vtutils, 0.1)
 AC_CONFIG_SRCDIR([src/vte.cc])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
@@ -21,9 +21,7 @@ AC_TYPE_UINT32_T
 
 # Checks for library functions.
 
-AC_CONFIG_FILES([Makefile
-                 man/Makefile
-                 src/Makefile])
+AC_CONFIG_FILES([Makefile])
 
 AC_OUTPUT
 

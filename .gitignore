@@ -37,7 +37,7 @@ config*
 aclocal*
 !Makefile.am
 !configure.ac
-src/.deps/
+.deps
 src/test
 stamp-h1
 autom4te.cache/
@@ -45,6 +45,8 @@ compile
 depcomp
 install-sh
 missing
+.dirstamp
+lib/
 
 # IDE files
 nbproject/
