@@ -47,6 +47,7 @@ install-sh
 missing
 .dirstamp
 lib/
+bin/
 
 # IDE files
 nbproject/
