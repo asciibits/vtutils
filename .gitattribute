@@ -1,0 +1,11 @@
+configure* linguist-vendored
+Makefile.* linguist-vendored
+config.h.in linguist-vendored
+compile linguist-vendored
+configure linguist-vendored
+depcomp linguist-vendored
+install-sh linguist-vendored
+missing linguist-vendored
+aclocal.m4 linguist-vendored
+autom4te.cache/** linguist-vendored
+
