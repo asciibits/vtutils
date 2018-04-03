@@ -18,6 +18,55 @@ namespace vtutils {
 namespace vte {
 
 namespace {
+/**
+ * Logging Callback
+ *
+ * @data: user-provided data
+ * @file: Source code file where the log message originated or NULL
+ * @line: Line number in source code or 0
+ * @func: C function name or NULL
+ * @subs: Subsystem where the message came from or NULL
+ * @sev: Kernel-style severity between 0=FATAL and 7=DEBUG
+ * @format: printf-formatted message
+ * @args: arguments for printf-style @format
+ *
+ * This is the type of a logging callback function. You can always pass NULL
+ * instead of such a function to disable logging.
+ */
+typedef void (*log_cb) (
+    std::string file,
+    int line,
+    std::string func,
+    unsigned int sev,
+    std::string format,
+    va_list args);
+
+static inline
+void log_format(log_cb logger,
+        std::string file,
+        int line,
+        std::string func,
+        unsigned int sev,
+        std::string format,
+        ...) {
+  va_list list;
+  if (logger) {
+    va_start(list, format);
+    logger(file, line, func, sev, format, list);
+    va_end(list);
+  }
+}
+
+#define LOG_DEFAULT __FILE__, __LINE__, __func__
+
+#define log_printf(obj, format, ...) \
+    log_format((obj)->_logger, \
+            LOG_DEFAULT, \
+            1, \
+            (format), \
+            ##__VA_ARGS__)
+
+
 // Input parser states
 enum ParserState {
   STATE_NONE,       // placeholder
@@ -79,9 +128,10 @@ struct saved_state {
 
 class Vte {
  public:
-  Vte(screen::Screen &s) : _screen(s) {
+  Vte(screen::Screen &s, log_cb l) : _screen(s), _logger(l) {
     reset();
   }
+  Vte(screen::Screen &s): Vte(s, nullptr) { };
 
   void input(char c);
   void input(std::string s);
@@ -91,20 +141,14 @@ class Vte {
 
  private:
   screen::Screen &_screen;
+  
   unsigned int _flags;
-  vtutils::unicode::Utf8To32Converter _utf8_converter;
   ParserState _state;
-//  int set_palette(const char *palette);
+  vtutils::unicode::Utf8To32Converter _utf8_converter;
 
-
-//  unsigned long ref;
-//  tsm_log_t llog;
-//  void *llog_data;
-//  struct tsm_screen *con;
+  log_cb _logger;
 //  tsm_vte_write_cb write_cb;
-//  void *data;
-//  char *palette_name;
-//
+
   unsigned int _parse_cnt = 0;
 
   unsigned int _csi_argc;

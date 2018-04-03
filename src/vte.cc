@@ -119,9 +119,12 @@ void Vte::input(std::string s) {
 void Vte::input(char c) {
   ++_parse_cnt;
   if (_flags & FLAG_7BIT_MODE) {
-    // if (u8 & 0x80)
-    //llog_debug(vte, "receiving 8bit character U+%d from pty while in 7bit mode",
-    //    (int)u8[i]);
+    if ((c & 0x80) != 0) {
+      log_printf(
+          this,
+          "receiving 8bit character U+%d from pty while in 7bit mode",
+          (int) c);
+    }
     parse_data(c & 0x7f);
   } else if (_flags & FLAG_8BIT_MODE) {
     parse_data(c);
@@ -373,8 +376,7 @@ void Vte::parse_data(char32_t raw) {
       // do nothing
       ;
   }
-
-//  llog_warn(vte, "unhandled input %u in state %d", raw, _state);
+  log_printf(this, "unhandled input %u in state %d", raw, _state);
 }
 
 // perform state transition and dispatch related actions
@@ -435,8 +437,8 @@ void Vte::do_action(char32_t data, ParserAction action) {
       break;
     case ACTION_OSC_END:
       break;
-//    default:
-//      llog_warn(vte, "invalid action %d", action);
+    default:
+      log_printf(this, "invalid action %d", action);
   }
 }
 
@@ -539,8 +541,8 @@ void Vte::do_execute(char32_t ctrl) {
       // End control string
       // nothing to do here
       break;
-//    default:
-//      llog_debug(vte, "unhandled control char %u", ctrl);
+    default:
+      log_printf(this, "unhandled control char %u", ctrl);
   }
 }
 
@@ -614,406 +616,404 @@ void Vte::do_param(char32_t data) {
 
 void Vte::do_esc(char32_t data) {
   switch (data) {
-    case 'B': /* map ASCII into G0-G3 */
+    case 'B': // map ASCII into G0-G3
       if (set_charset(&charsets::unicode_lower))
         return;
       break;
-    case '<': /* map DEC supplemental into G0-G3 */
+    case '<': // map DEC supplemental into G0-G3
       if (set_charset(&charsets::dec_supplemental_graphics))
         return;
       break;
-    case '0': /* map DEC special into G0-G3 */
+    case '0': // map DEC special into G0-G3
       if (set_charset(&charsets::dec_special_graphics))
         return;
       break;
-    case 'A': /* map British into G0-G3 */
-      /* TODO: create British charset from DEC */
+    case 'A': // map British into G0-G3
+      // TODO: create British charset from DEC
       if (set_charset(&charsets::unicode_upper))
         return;
       break;
-    case '4': /* map Dutch into G0-G3 */
-      /* TODO: create Dutch charset from DEC */
+    case '4': // map Dutch into G0-G3
+      // TODO: create Dutch charset from DEC
       if (set_charset(&charsets::unicode_upper))
         return;
       break;
     case 'C':
-    case '5': /* map Finnish into G0-G3 */
-      /* TODO: create Finnish charset from DEC */
+    case '5': // map Finnish into G0-G3
+      // TODO: create Finnish charset from DEC
       if (set_charset(&charsets::unicode_upper))
         return;
       break;
-    case 'R': /* map French into G0-G3 */
-      /* TODO: create French charset from DEC */
+    case 'R': // map French into G0-G3
+      // TODO: create French charset from DEC
       if (set_charset(&charsets::unicode_upper))
         return;
       break;
-    case 'Q': /* map French-Canadian into G0-G3 */
-      /* TODO: create French-Canadian charset from DEC */
+    case 'Q': // map French-Canadian into G0-G3
+      // TODO: create French-Canadian charset from DEC
       if (set_charset(&charsets::unicode_upper))
         return;
       break;
-    case 'K': /* map German into G0-G3 */
-      /* TODO: create German charset from DEC */
+    case 'K': // map German into G0-G3
+      // TODO: create German charset from DEC
       if (set_charset(&charsets::unicode_upper))
         return;
       break;
-    case 'Y': /* map Italian into G0-G3 */
-      /* TODO: create Italian charset from DEC */
+    case 'Y': // map Italian into G0-G3
+      // TODO: create Italian charset from DEC
       if (set_charset(&charsets::unicode_upper))
         return;
       break;
     case 'E':
-    case '6': /* map Norwegian/Danish into G0-G3 */
-      /* TODO: create Norwegian/Danish charset from DEC */
+    case '6': // map Norwegian/Danish into G0-G3
+      // TODO: create Norwegian/Danish charset from DEC
       if (set_charset(&charsets::unicode_upper))
         return;
       break;
-    case 'Z': /* map Spanish into G0-G3 */
-      /* TODO: create Spanish charset from DEC */
+    case 'Z': // map Spanish into G0-G3
+      // TODO: create Spanish charset from DEC
       if (set_charset(&charsets::unicode_upper))
         return;
       break;
     case 'H':
-    case '7': /* map Swedish into G0-G3 */
-      /* TODO: create Swedish charset from DEC */
+    case '7': // map Swedish into G0-G3
+      // TODO: create Swedish charset from DEC
       if (set_charset(&charsets::unicode_upper))
         return;
       break;
-    case '=': /* map Swiss into G0-G3 */
-      /* TODO: create Swiss charset from DEC */
+    case '=': // map Swiss into G0-G3
+      // TODO: create Swiss charset from DEC
       if (set_charset(&charsets::unicode_upper))
         return;
       break;
     case 'F':
       if (_csi_flags & CSI_SPACE) {
-        /* S7C1T */
-        /* Disable 8bit C1 mode */
+        // S7C1T
+        // Disable 8bit C1 mode
         _flags &= ~FLAG_USE_C1;
         return;
       }
       break;
     case 'G':
       if (_csi_flags & CSI_SPACE) {
-        /* S8C1T */
-        /* Enable 8bit C1 mode */
+        // S8C1T
+        // Enable 8bit C1 mode
         _flags |= FLAG_USE_C1;
         return;
       }
       break;
   }
 
-  /* everything below is only valid without CSI flags */
+  // everything below is only valid without CSI flags
   if (_csi_flags) {
-//    llog_debug("unhandled escape seq %u", data);
+    log_printf(this, "unhandled escape seq %u", data);
     return;
   }
 
   switch (data) {
-    case 'D': /* IND */
-      /* Move down one row, perform scroll-up if needed */
+    case 'D': // IND
+      // Move down one row, perform scroll-up if needed
       _screen.move_down(1, true);
       break;
-    case 'E': /* NEL */
-      /* CR/NL with scroll-up if needed */
+    case 'E': // NEL
+      // CR/NL with scroll-up if needed
       _screen.newline();
       break;
-    case 'H': /* HTS */
-      /* Set tab stop at current position */
+    case 'H': // HTS
+      // Set tab stop at current position
       _screen.set_tabstop();
       break;
-    case 'M': /* RI */
-      /* Move up one row, perform scroll-down if needed */
+    case 'M': // RI
+      // Move up one row, perform scroll-down if needed
       _screen.move_up(1, true);
       break;
-    case 'N': /* SS2 */
-      /* Temporarily map G2 into GL for next char only */
+    case 'N': // SS2
+      // Temporarily map G2 into GL for next char only
       _glt = _g2;
       break;
-    case 'O': /* SS3 */
-      /* Temporarily map G3 into GL for next char only */
+    case 'O': // SS3
+      // Temporarily map G3 into GL for next char only
       _glt = _g3;
       break;
-    case 'Z': /* DECID */
-      /* Send device attributes response like ANSI DA */
+    case 'Z': // DECID
+      // Send device attributes response like ANSI DA
       send_primary_da();
       break;
-    case '\\': /* ST */
-      /* End control string */
-      /* nothing to do here */
+    case '\\': // ST
+      // End control string
+      // nothing to do here
       break;
-    case '~': /* LS1R */
-      /* Invoke G1 into GR */
+    case '~': // LS1R
+      // Invoke G1 into GR
       _gr = _g1;
       break;
-    case 'n': /* LS2 */
-      /* Invoke G2 into GL */
+    case 'n': // LS2
+      // Invoke G2 into GL
       _gl = _g2;
       break;
-    case '}': /* LS2R */
-      /* Invoke G2 into GR */
+    case '}': // LS2R
+      // Invoke G2 into GR
       _gr = _g2;
       break;
-    case 'o': /* LS3 */
-      /* Invoke G3 into GL */
+    case 'o': // LS3
+      // Invoke G3 into GL
       _gl = _g3;
       break;
-    case '|': /* LS3R */
-      /* Invoke G3 into GR */
+    case '|': // LS3R
+      // Invoke G3 into GR
       _gr = _g3;
       break;
-    case '=': /* DECKPAM */
-      /* Set application keypad mode */
+    case '=': // DECKPAM
+      // Set application keypad mode
       _flags |= FLAG_KEYPAD_APPLICATION_MODE;
       break;
-    case '>': /* DECKPNM */
-      /* Set numeric keypad mode */
+    case '>': // DECKPNM
+      // Set numeric keypad mode
       _flags &= ~FLAG_KEYPAD_APPLICATION_MODE;
       break;
-    case 'c': /* RIS */
-      /* hard reset */
+    case 'c': // RIS
+      // hard reset
       hard_reset();
       break;
-    case '7': /* DECSC */
-      /* save console state */
+    case '7': // DECSC
+      // save console state
       save_state();
       break;
-    case '8': /* DECRC */
-      /* restore console state */
+    case '8': // DECRC
+      // restore console state
       restore_state();
       break;
-      //	default:
-      //		llog_debug(vte, "unhandled escape seq %u", data);
+    default:
+      log_printf(this, "unhandled escape seq %u", data);
   }
 }
 
 void Vte::do_csi(char32_t data) {
-	int num, x, y, upper, lower;
-	bool protect;
+  int num, x, y, upper, lower;
+  bool protect;
 
-	if (_csi_argc < CSI_ARG_MAX)
-		_csi_argc++;
+  if (_csi_argc < CSI_ARG_MAX)
+    _csi_argc++;
 
-	switch (data) {
-	case 'A': /* CUU */
-		/* move cursor up */
-		num = _csi_argv[0];
-		if (num <= 0)
-			num = 1;
-		_screen.move_up(num, false);
-		break;
-	case 'B': /* CUD */
-		/* move cursor down */
-		num = _csi_argv[0];
-		if (num <= 0)
-			num = 1;
-		_screen.move_down(num, false);
-		break;
-	case 'C': /* CUF */
-		/* move cursor forward */
-		num = _csi_argv[0];
-		if (num <= 0)
-			num = 1;
-		_screen.move_right(num);
-		break;
-	case 'D': /* CUB */
-		/* move cursor backward */
-		num = _csi_argv[0];
-		if (num <= 0)
-			num = 1;
-		_screen.move_left(num);
-		break;
-	case 'd': /* VPA */
-		/* Vertical Line Position Absolute */
-		num = _csi_argv[0];
-		if (num <= 0)
-			num = 1;
-		x = _screen.get_cursor_x();
-		_screen.move_to(x, num - 1);
-		break;
-	case 'e': /* VPR */
-		/* Vertical Line Position Relative */
-		num = _csi_argv[0];
-		if (num <= 0)
-			num = 1;
-		x = _screen.get_cursor_x();
-		y = _screen.get_cursor_y();
-		_screen.move_to(x, y + num);
-		break;
-	case 'H': /* CUP */
-	case 'f': /* HVP */
-		/* position cursor */
-		x = _csi_argv[0];
-		if (x <= 0)
-			x = 1;
-		y = _csi_argv[1];
-		if (y <= 0)
-			y = 1;
-		_screen.move_to(y - 1, x - 1);
-		break;
-	case 'G': /* CHA */
-		/* Cursor Character Absolute */
-		num = _csi_argv[0];
-		if (num <= 0)
-			num = 1;
-		y = _screen.get_cursor_y();
-		_screen.move_to(num - 1, y);
-		break;
-	case 'J':
-		if (_csi_flags & CSI_WHAT)
-			protect = true;
-		else
-			protect = false;
+  switch (data) {
+    case 'A': // CUU
+      // move cursor up
+      num = _csi_argv[0];
+      if (num <= 0)
+        num = 1;
+      _screen.move_up(num, false);
+      break;
+    case 'B': // CUD
+      // move cursor down
+      num = _csi_argv[0];
+      if (num <= 0)
+        num = 1;
+      _screen.move_down(num, false);
+      break;
+    case 'C': // CUF
+      // move cursor forward
+      num = _csi_argv[0];
+      if (num <= 0)
+        num = 1;
+      _screen.move_right(num);
+      break;
+    case 'D': // CUB
+      // move cursor backward
+      num = _csi_argv[0];
+      if (num <= 0)
+        num = 1;
+      _screen.move_left(num);
+      break;
+    case 'd': // VPA
+      // Vertical Line Position Absolute
+      num = _csi_argv[0];
+      if (num <= 0)
+        num = 1;
+      x = _screen.get_cursor_x();
+      _screen.move_to(x, num - 1);
+      break;
+    case 'e': // VPR
+      // Vertical Line Position Relative
+      num = _csi_argv[0];
+      if (num <= 0)
+        num = 1;
+      x = _screen.get_cursor_x();
+      y = _screen.get_cursor_y();
+      _screen.move_to(x, y + num);
+      break;
+    case 'H': // CUP
+    case 'f': // HVP
+      // position cursor
+      x = _csi_argv[0];
+      if (x <= 0)
+        x = 1;
+      y = _csi_argv[1];
+      if (y <= 0)
+        y = 1;
+      _screen.move_to(y - 1, x - 1);
+      break;
+    case 'G': // CHA
+      // Cursor Character Absolute
+      num = _csi_argv[0];
+      if (num <= 0)
+        num = 1;
+      y = _screen.get_cursor_y();
+      _screen.move_to(num - 1, y);
+      break;
+    case 'J':
+      if (_csi_flags & CSI_WHAT)
+        protect = true;
+      else
+        protect = false;
 
-		if (_csi_argv[0] <= 0)
-			_screen.erase_cursor_to_screen(protect);
-		else if (_csi_argv[0] == 1)
-			_screen.erase_screen_to_cursor(protect);
-		else if (_csi_argv[0] == 2)
-			_screen.erase_screen(protect);
-//		else
-//			llog_debug(vte, "unknown parameter to CSI-J: %d",
-//				   _csi_argv[0]);
-		break;
-	case 'K':
-		if (_csi_flags & CSI_WHAT)
-			protect = true;
-		else
-			protect = false;
+      if (_csi_argv[0] <= 0)
+        _screen.erase_cursor_to_screen(protect);
+      else if (_csi_argv[0] == 1)
+        _screen.erase_screen_to_cursor(protect);
+      else if (_csi_argv[0] == 2)
+        _screen.erase_screen(protect);
+      else
+        log_printf(this, "unknown parameter to CSI-J: %d", _csi_argv[0]);
+      break;
+    case 'K':
+      if (_csi_flags & CSI_WHAT)
+        protect = true;
+      else
+        protect = false;
 
-		if (_csi_argv[0] <= 0)
-			_screen.erase_cursor_to_end(protect);
-		else if (_csi_argv[0] == 1)
-			_screen.erase_home_to_cursor(protect);
-		else if (_csi_argv[0] == 2)
-			_screen.erase_current_line(protect);
-//		else
-//			llog_debug(vte, "unknown parameter to CSI-K: %d",
-//				   _csi_argv[0]);
-		break;
-	case 'X': /* ECH */
-		/* erase characters */
-		num = _csi_argv[0];
-		if (num <= 0)
-			num = 1;
-		_screen.erase_chars(num);
-		break;
-	case 'm':
-		csi_attribute();
-		break;
-	case 'p':
-		if (_csi_flags & CSI_GT) {
-			/* xterm: select X11 visual cursor mode */
-			csi_soft_reset();
-		} else if (_csi_flags & CSI_BANG) {
-			/* DECSTR: Soft Reset */
-			csi_soft_reset();
-		} else if (_csi_flags & CSI_CASH) {
-			/* DECRQM: Request DEC Private Mode */
-			/* If CSI_WHAT is set, then enable,
-			 * otherwise disable */
-			csi_soft_reset();
-		} else {
-			/* DECSCL: Compatibility Level */
-			/* Sometimes CSI_DQUOTE is set here, too */
-			csi_compat_mode();
-		}
-		break;
-	case 'h': /* SM: Set Mode */
-		csi_mode(true);
-		break;
-	case 'l': /* RM: Reset Mode */
-		csi_mode(false);
-		break;
-	case 'r': /* DECSTBM */
-		/* set margin size */
-		upper = _csi_argv[0];
-		if (upper < 0) {
-			upper = 0;
-        }
-		lower = _csi_argv[1];
-		if (lower < 0) {
-			lower = 0;
-        }
-		_screen.set_margins(upper, lower);
-		break;
-	case 'c': /* DA */
-		/* device attributes */
-		csi_dev_attr();
-		break;
-	case 'L': /* IL */
-		/* insert lines */
-		num = _csi_argv[0];
-		if (num <= 0)
-			num = 1;
-		_screen.insert_lines(num);
-		break;
-	case 'M': /* DL */
-		/* delete lines */
-		num = _csi_argv[0];
-		if (num <= 0)
-			num = 1;
-		_screen.delete_lines(num);
-		break;
-	case 'g': /* TBC */
-		/* tabulation clear */
-		num = _csi_argv[0];
-		if (num <= 0) {
-			_screen.reset_tabstop();
-		} else if (num == 3) {
-			_screen.reset_all_tabstops();
-        }
-//		else
-//			llog_debug(vte, "invalid parameter %d to TBC CSI", num);
-		break;
-	case '@': /* ICH */
-		/* insert characters */
-		num = _csi_argv[0];
-		if (num <= 0)
-			num = 1;
-		_screen.insert_chars(num);
-		break;
-	case 'P': /* DCH */
-		/* delete characters */
-		num = _csi_argv[0];
-		if (num <= 0)
-			num = 1;
-		_screen.delete_chars(num);
-		break;
-	case 'Z': /* CBT */
-		/* cursor horizontal backwards tab */
-		num = _csi_argv[0];
-		if (num <= 0)
-			num = 1;
-		_screen.tab_left(num);
-		break;
-	case 'I': /* CHT */
-		/* cursor horizontal forward tab */
-		num = _csi_argv[0];
-		if (num <= 0)
-			num = 1;
-		_screen.tab_right(num);
-		break;
-	case 'n': /* DSR */
-		/* device status reports */
-		csi_dsr();
-		break;
-	case 'S': /* SU */
-		/* scroll up */
-		num = _csi_argv[0];
-		if (num <= 0)
-			num = 1;
-		_screen.scroll_up(num);
-		break;
-	case 'T': /* SD */
-		/* scroll down */
-		num = _csi_argv[0];
-		if (num <= 0)
-			num = 1;
-		_screen.scroll_down(num);
-		break;
-//	default:
-//		llog_debug(vte, "unhandled CSI sequence %c", data);
-	}
+      if (_csi_argv[0] <= 0)
+        _screen.erase_cursor_to_end(protect);
+      else if (_csi_argv[0] == 1)
+        _screen.erase_home_to_cursor(protect);
+      else if (_csi_argv[0] == 2)
+        _screen.erase_current_line(protect);
+      else
+        log_printf(this, "unknown parameter to CSI-K: %d", _csi_argv[0]);
+      break;
+    case 'X': // ECH
+      // erase characters
+      num = _csi_argv[0];
+      if (num <= 0)
+        num = 1;
+      _screen.erase_chars(num);
+      break;
+    case 'm':
+      csi_attribute();
+      break;
+    case 'p':
+      if (_csi_flags & CSI_GT) {
+        // xterm: select X11 visual cursor mode
+        csi_soft_reset();
+      } else if (_csi_flags & CSI_BANG) {
+        // DECSTR: Soft Reset
+        csi_soft_reset();
+      } else if (_csi_flags & CSI_CASH) {
+        // DECRQM: Request DEC Private Mode
+        // If CSI_WHAT is set, then enable,
+        // otherwise disable
+        csi_soft_reset();
+      } else {
+        // DECSCL: Compatibility Level
+        // Sometimes CSI_DQUOTE is set here, too
+        csi_compat_mode();
+      }
+      break;
+    case 'h': // SM: Set Mode
+      csi_mode(true);
+      break;
+    case 'l': // RM: Reset Mode
+      csi_mode(false);
+      break;
+    case 'r': // DECSTBM
+      // set margin size
+      upper = _csi_argv[0];
+      if (upper < 0) {
+        upper = 0;
+      }
+      lower = _csi_argv[1];
+      if (lower < 0) {
+        lower = 0;
+      }
+      _screen.set_margins(upper, lower);
+      break;
+    case 'c': // DA
+      // device attributes
+      csi_dev_attr();
+      break;
+    case 'L': // IL
+      // insert lines
+      num = _csi_argv[0];
+      if (num <= 0)
+        num = 1;
+      _screen.insert_lines(num);
+      break;
+    case 'M': // DL
+      // delete lines
+      num = _csi_argv[0];
+      if (num <= 0)
+        num = 1;
+      _screen.delete_lines(num);
+      break;
+    case 'g': // TBC
+      // tabulation clear
+      num = _csi_argv[0];
+      if (num <= 0) {
+        _screen.reset_tabstop();
+      } else if (num == 3) {
+        _screen.reset_all_tabstops();
+      } else {
+        log_printf(this, "invalid parameter %d to TBC CSI", num);
+      }
+      break;
+    case '@': // ICH
+      // insert characters
+      num = _csi_argv[0];
+      if (num <= 0)
+        num = 1;
+      _screen.insert_chars(num);
+      break;
+    case 'P': // DCH
+      // delete characters
+      num = _csi_argv[0];
+      if (num <= 0)
+        num = 1;
+      _screen.delete_chars(num);
+      break;
+    case 'Z': // CBT
+      // cursor horizontal backwards tab
+      num = _csi_argv[0];
+      if (num <= 0)
+        num = 1;
+      _screen.tab_left(num);
+      break;
+    case 'I': // CHT
+      // cursor horizontal forward tab
+      num = _csi_argv[0];
+      if (num <= 0)
+        num = 1;
+      _screen.tab_right(num);
+      break;
+    case 'n': // DSR
+      // device status reports
+      csi_dsr();
+      break;
+    case 'S': // SU
+      // scroll up
+      num = _csi_argv[0];
+      if (num <= 0)
+        num = 1;
+      _screen.scroll_up(num);
+      break;
+    case 'T': // SD
+      // scroll down
+      num = _csi_argv[0];
+      if (num <= 0)
+        num = 1;
+      _screen.scroll_down(num);
+      break;
+      default:
+        log_printf(this, "unhandled CSI sequence %c", data);
+  }
 }
 
 void Vte::csi_attribute() {
@@ -1168,7 +1168,7 @@ void Vte::csi_attribute() {
         if (i + 2 >= _csi_argc ||
             _csi_argv[i + 1] != 5 ||
             _csi_argv[i + 2] < 0) {
-//          llog_debug(vte, "invalid 256color SGR");
+            log_printf(this, "invalid 256color SGR");
           break;
         }
 
@@ -1213,9 +1213,8 @@ void Vte::csi_attribute() {
 
         i += 2;
         break;
-//      default:
-//        llog_debug(vte, "unhandled SGR attr %i",
-//            _csi_argv[i]);
+      default:
+        log_printf(this, "unhandled SGR attr %i", _csi_argv[i]);
     }
   }
 
@@ -1263,8 +1262,10 @@ void Vte::csi_compat_mode() {
     _g0 = &charsets::unicode_lower;
     _g1 = &charsets::dec_supplemental_graphics;
   } else {
-//    llog_debug(vte, "unhandled DECSCL 'p' CSI %i, switching to utf-8 mode again",
-//        vte->csi_argv[0]);
+    log_printf(
+        this,
+        "unhandled DECSCL 'p' CSI %i, switching to utf-8 mode again",
+        _csi_argv[0]);
   }
 }
 
@@ -1294,8 +1295,7 @@ void Vte::csi_mode(bool set) {
           set_reset_flag(set, FLAG_LINE_FEED_NEW_LINE_MODE);
           continue;
         default:
-//          llog_debug(vte, "unknown non-DEC (Re)Set-Mode %d",
-//              _csi_argv[i]);
+          log_printf(this, "unknown non-DEC (Re)Set-Mode %d", _csi_argv[i]);
           continue;
       }
     }
@@ -1442,8 +1442,11 @@ void Vte::csi_mode(bool set) {
         }
         continue;
       default:
-//        llog_debug(vte, "unknown DEC %set-Mode %d",
-//            set ? "S" : "Res", _csi_argv[i]);
+        log_printf(
+            this,
+            "unknown DEC %set-Mode %d",
+            set ? "S" : "Res",
+            _csi_argv[i]);
         continue;
     }
   }
@@ -1459,9 +1462,13 @@ void Vte::csi_dev_attr() {
       return;
     }
   }
-//
-//  llog_debug(vte, "unhandled DA: %x %d %d %d...", _csi_flags,
-//      _csi_argv[0], _csi_argv[1], _csi_argv[2]);
+  log_printf(
+      this,
+      "unhandled DA: %x %d %d %d...",
+      _csi_flags,
+      _csi_argv[0],
+      _csi_argv[1],
+      _csi_argv[2]);
 }
 
 void Vte::csi_dsr() {
@@ -1488,8 +1495,8 @@ void Vte::send_primary_da() {
 
 void Vte::write(const std::string u8) {
 //#ifdef BUILD_ENABLE_DEBUG
-//	/* in debug mode we check that escape sequences are always <0x7f so they
-//	 * are correctly parsed by non-unicode and non-8bit-mode clients. */
+//	// in debug mode we check that escape sequences are always <0x7f so they
+//	 * are correctly parsed by non-unicode and non-8bit-mode clients.
 //	size_t i;
 //
 //	if (!raw) {
@@ -1501,7 +1508,7 @@ void Vte::write(const std::string u8) {
 //	}
 //#endif
 
-  /* in local echo mode, directly parse the data again */
+  // in local echo mode, directly parse the data again
   if (_parse_cnt == 0 && (_flags & FLAG_SEND_RECEIVE_MODE) == 0) {
     if ((_flags & FLAG_PREPEND_ESCAPE) != 0) {
       input('\033');
