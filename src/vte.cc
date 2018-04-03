@@ -116,7 +116,13 @@ void Vte::input(std::string s) {
     input(c);
   }
 }
+
 void Vte::input(char c) {
+  log_printf(
+    this,
+    "processing char: %c",
+    c);
+
   ++_parse_cnt;
   if (_flags & FLAG_7BIT_MODE) {
     if ((c & 0x80) != 0) {
