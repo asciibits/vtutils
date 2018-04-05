@@ -8,6 +8,7 @@ namespace screen {
 void CursesScreen::reset() {
   std::cout << "CursesScreen#reset: " << std::endl;
   _flags = 0;
+  curs_set(1);
 }
 void CursesScreen::hard_reset() {
   std::cout << "CursesScreen#hard_reset: " << std::endl;
@@ -22,8 +23,8 @@ void CursesScreen::set_flags(unsigned int flags) {
     // TODO
   }
   if ((old & SCREEN_HIDE_CURSOR) != (_flags & SCREEN_HIDE_CURSOR)) {
-    // un-invert current cursor pos
-    // TODO
+    // hide the cursor
+    curs_set(0);
   }
   if ((old & SCREEN_INVERSE) != (_flags & SCREEN_INVERSE)) {
     // Invert the entire screen
@@ -33,7 +34,24 @@ void CursesScreen::set_flags(unsigned int flags) {
   std::cout << "CursesScreen#set_flags: " << flags << std::endl;
 }
 void CursesScreen::reset_flags(unsigned int flags) {
-  std::cout << "CursesScreen#reset_flags: " << flags << std::endl;
+  unsigned int old = _flags;
+  _flags &= ~flags;
+  if ((old & SCREEN_ALTERNATE) != (_flags & SCREEN_ALTERNATE)) {
+    def_shell_mode();
+    // ncurses always runs in alternate mode... emulate using an
+    // offline buffer
+    // TODO
+  }
+  if ((old & SCREEN_HIDE_CURSOR) != (_flags & SCREEN_HIDE_CURSOR)) {
+    // un-hide the cursor
+    curs_set(1);
+  }
+  if ((old & SCREEN_INVERSE) != (_flags & SCREEN_INVERSE)) {
+    // Un-Invert the entire screen
+    // TODO
+  }
+  
+  std::cout << "CursesScreen#set_flags: " << flags << std::endl;
 }
 
 void CursesScreen::write(char32_t sym, Attr *attr) {
