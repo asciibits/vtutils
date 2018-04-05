@@ -1,6 +1,7 @@
 #ifndef VTUTILS_DEBUG_SCREEN_H_
 #define VTUTILS_DEBUG_SCREEN_H_
 
+#include "config.h"
 #include "screen.h"
 
 namespace vtutils {

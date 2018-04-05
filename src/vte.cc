@@ -1067,106 +1067,106 @@ void Vte::csi_attribute() {
         _attr.inverse = 0;
         break;
       case 30:
-        _attr.fg.color_code = screen::COLOR_BLACK;
+        _attr.fg.color_code = screen::COLOR_CODE_BLACK;
         break;
       case 31:
-        _attr.fg.color_code = screen::COLOR_RED;
+        _attr.fg.color_code = screen::COLOR_CODE_RED;
         break;
       case 32:
-        _attr.fg.color_code = screen::COLOR_GREEN;
+        _attr.fg.color_code = screen::COLOR_CODE_GREEN;
         break;
       case 33:
-        _attr.fg.color_code = screen::COLOR_YELLOW;
+        _attr.fg.color_code = screen::COLOR_CODE_YELLOW;
         break;
       case 34:
-        _attr.fg.color_code = screen::COLOR_BLUE;
+        _attr.fg.color_code = screen::COLOR_CODE_BLUE;
         break;
       case 35:
-        _attr.fg.color_code = screen::COLOR_MAGENTA;
+        _attr.fg.color_code = screen::COLOR_CODE_MAGENTA;
         break;
       case 36:
-        _attr.fg.color_code = screen::COLOR_CYAN;
+        _attr.fg.color_code = screen::COLOR_CODE_CYAN;
         break;
       case 37:
-        _attr.fg.color_code = screen::COLOR_LIGHT_GREY;
+        _attr.fg.color_code = screen::COLOR_CODE_LIGHT_GREY;
         break;
       case 39:
         _attr.fg = _screen.default_attr().fg;
         break;
       case 40:
-        _attr.bg.color_code = screen::COLOR_BLACK;
+        _attr.bg.color_code = screen::COLOR_CODE_BLACK;
         break;
       case 41:
-        _attr.bg.color_code = screen::COLOR_RED;
+        _attr.bg.color_code = screen::COLOR_CODE_RED;
         break;
       case 42:
-        _attr.bg.color_code = screen::COLOR_GREEN;
+        _attr.bg.color_code = screen::COLOR_CODE_GREEN;
         break;
       case 43:
-        _attr.bg.color_code = screen::COLOR_YELLOW;
+        _attr.bg.color_code = screen::COLOR_CODE_YELLOW;
         break;
       case 44:
-        _attr.bg.color_code = screen::COLOR_BLUE;
+        _attr.bg.color_code = screen::COLOR_CODE_BLUE;
         break;
       case 45:
-        _attr.bg.color_code = screen::COLOR_MAGENTA;
+        _attr.bg.color_code = screen::COLOR_CODE_MAGENTA;
         break;
       case 46:
-        _attr.bg.color_code = screen::COLOR_CYAN;
+        _attr.bg.color_code = screen::COLOR_CODE_CYAN;
         break;
       case 47:
-        _attr.bg.color_code = screen::COLOR_LIGHT_GREY;
+        _attr.bg.color_code = screen::COLOR_CODE_LIGHT_GREY;
         break;
       case 49:
         _attr.bg = _screen.default_attr().bg;
         break;
       case 90:
-        _attr.fg.color_code = screen::COLOR_DARK_GREY;
+        _attr.fg.color_code = screen::COLOR_CODE_DARK_GREY;
         break;
       case 91:
-        _attr.fg.color_code = screen::COLOR_LIGHT_RED;
+        _attr.fg.color_code = screen::COLOR_CODE_LIGHT_RED;
         break;
       case 92:
-        _attr.fg.color_code = screen::COLOR_LIGHT_GREEN;
+        _attr.fg.color_code = screen::COLOR_CODE_LIGHT_GREEN;
         break;
       case 93:
-        _attr.fg.color_code = screen::COLOR_LIGHT_YELLOW;
+        _attr.fg.color_code = screen::COLOR_CODE_LIGHT_YELLOW;
         break;
       case 94:
-        _attr.fg.color_code = screen::COLOR_LIGHT_BLUE;
+        _attr.fg.color_code = screen::COLOR_CODE_LIGHT_BLUE;
         break;
       case 95:
-        _attr.fg.color_code = screen::COLOR_LIGHT_MAGENTA;
+        _attr.fg.color_code = screen::COLOR_CODE_LIGHT_MAGENTA;
         break;
       case 96:
-        _attr.fg.color_code = screen::COLOR_LIGHT_CYAN;
+        _attr.fg.color_code = screen::COLOR_CODE_LIGHT_CYAN;
         break;
       case 97:
-        _attr.fg.color_code = screen::COLOR_WHITE;
+        _attr.fg.color_code = screen::COLOR_CODE_WHITE;
         break;
       case 100:
-        _attr.bg.color_code = screen::COLOR_DARK_GREY;
+        _attr.bg.color_code = screen::COLOR_CODE_DARK_GREY;
         break;
       case 101:
-        _attr.bg.color_code = screen::COLOR_LIGHT_RED;
+        _attr.bg.color_code = screen::COLOR_CODE_LIGHT_RED;
         break;
       case 102:
-        _attr.bg.color_code = screen::COLOR_LIGHT_GREEN;
+        _attr.bg.color_code = screen::COLOR_CODE_LIGHT_GREEN;
         break;
       case 103:
-        _attr.bg.color_code = screen::COLOR_LIGHT_YELLOW;
+        _attr.bg.color_code = screen::COLOR_CODE_LIGHT_YELLOW;
         break;
       case 104:
-        _attr.bg.color_code = screen::COLOR_LIGHT_BLUE;
+        _attr.bg.color_code = screen::COLOR_CODE_LIGHT_BLUE;
         break;
       case 105:
-        _attr.bg.color_code = screen::COLOR_LIGHT_MAGENTA;
+        _attr.bg.color_code = screen::COLOR_CODE_LIGHT_MAGENTA;
         break;
       case 106:
-        _attr.bg.color_code = screen::COLOR_LIGHT_CYAN;
+        _attr.bg.color_code = screen::COLOR_CODE_LIGHT_CYAN;
         break;
       case 107:
-        _attr.bg.color_code = screen::COLOR_WHITE;
+        _attr.bg.color_code = screen::COLOR_CODE_WHITE;
         break;
       case 38:
         // fallthrough
@@ -1183,7 +1183,7 @@ void Vte::csi_attribute() {
           if (code < 16) {
             _attr.fg.color_code = (screen::ColorCode) code;
           } else if (code < 232) {
-            _attr.fg.color_code = screen::COLOR_RGB;
+            _attr.fg.color_code = screen::COLOR_CODE_RGB;
             code -= 16;
             _attr.fg.b = bval[code % 6];
             code /= 6;
@@ -1191,7 +1191,7 @@ void Vte::csi_attribute() {
             code /= 6;
             _attr.fg.r = bval[code % 6];
           } else {
-            _attr.fg.color_code = screen::COLOR_RGB;
+            _attr.fg.color_code = screen::COLOR_CODE_RGB;
             code = (code - 232) * 10 + 8;
             _attr.fg.r = code;
             _attr.fg.g = code;
@@ -1201,7 +1201,7 @@ void Vte::csi_attribute() {
           if (code < 16) {
             _attr.bg.color_code = (screen::ColorCode) code;
           } else if (code < 232) {
-            _attr.bg.color_code = screen::COLOR_RGB;
+            _attr.bg.color_code = screen::COLOR_CODE_RGB;
             code -= 16;
             _attr.bg.b = bval[code % 6];
             code /= 6;
@@ -1209,7 +1209,7 @@ void Vte::csi_attribute() {
             code /= 6;
             _attr.bg.r = bval[code % 6];
           } else {
-            _attr.bg.color_code = screen::COLOR_RGB;
+            _attr.bg.color_code = screen::COLOR_CODE_RGB;
             code = (code - 232) * 10 + 8;
             _attr.bg.r = code;
             _attr.bg.g = code;

@@ -3,8 +3,6 @@
 
 #include <memory>
 
-#include "config.h"
-
 namespace vtutils {
 namespace unicode {
 

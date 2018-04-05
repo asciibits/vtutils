@@ -47,7 +47,7 @@ Attr DebugScreen::default_attr() {
   return Attr{};
 }
 
-void DebugScreen::set_def_attr(screen::Attr attr) {
+void DebugScreen::set_def_attr(Attr attr) {
   std::cout << "DebugScreen#set_def_attr: " << attr << std::endl;
 }
 

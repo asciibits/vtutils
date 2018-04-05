@@ -3,9 +3,10 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <stdexcept>
 #include <iostream>
 #include <memory>
+#include <stdarg.h>
+#include <stdexcept>
 #include <string>
 
 #include "charsets.h"
