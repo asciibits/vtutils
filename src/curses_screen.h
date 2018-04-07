@@ -1,6 +1,9 @@
 #ifndef CURSES_SCREEN_H
 #define CURSES_SCREEN_H
 
+#define _XOPEN_SOURCE_
+
+#include <iostream>
 #include <uchar.h>
 
 #include "config.h"
@@ -23,7 +26,7 @@ public:
   void set_flags(unsigned int flags) override;
   void reset_flags(unsigned int flags) override;
 
-  void write(char32_t sym, Attr *attr) override;
+  void print(char32_t sym, Attr *attr) override;
   void newline() override;
   void insert_lines(unsigned int num) override;
   void delete_lines(unsigned int num) override;
@@ -62,6 +65,8 @@ public:
   void erase_chars(unsigned int num) override;
   
   void set_margins(unsigned int top, unsigned int bottom) override;
+  
+  void write(char sym) override;
   
 private:
   WINDOW *const _win;

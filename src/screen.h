@@ -69,7 +69,9 @@ class Screen {
   virtual void set_flags(unsigned int flags) = 0;
   virtual void reset_flags(unsigned int flags) = 0;
   
-  virtual void write(char32_t sym, Attr *attr) = 0;
+  // print the character to the screen
+  virtual void print(char32_t sym, Attr *attr) = 0;
+  
   virtual void newline() = 0;
   virtual void insert_lines(unsigned int num) = 0;
   virtual void delete_lines(unsigned int num) = 0;
@@ -109,6 +111,9 @@ class Screen {
   virtual void erase_chars(unsigned int num) = 0;
   
   virtual void set_margins(unsigned int top, unsigned int bottom) = 0;
+  
+  // push the character to the sub-processes std-in
+  virtual void write(char sym) = 0;
 };
 
 } // namespace screen

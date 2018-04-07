@@ -18,13 +18,12 @@ void CursesScreen::set_flags(unsigned int flags) {
   unsigned int old = _flags;
   _flags |= flags;
   if ((old & SCREEN_ALTERNATE) != (_flags & SCREEN_ALTERNATE)) {
-    // ncurses always runs in alternate mode... emulate using an
-    // offline buffer
-    // TODO
+    // TODO... how to handle alternate screen?
+    // We can emulate it, or use the existing terminal's ability...
   }
   if ((old & SCREEN_HIDE_CURSOR) != (_flags & SCREEN_HIDE_CURSOR)) {
     // hide the cursor
-    curs_set(0);
+    curs_set(0); // test changes
   }
   if ((old & SCREEN_INVERSE) != (_flags & SCREEN_INVERSE)) {
     // Invert the entire screen
@@ -38,8 +37,6 @@ void CursesScreen::reset_flags(unsigned int flags) {
   _flags &= ~flags;
   if ((old & SCREEN_ALTERNATE) != (_flags & SCREEN_ALTERNATE)) {
     def_shell_mode();
-    // ncurses always runs in alternate mode... emulate using an
-    // offline buffer
     // TODO
   }
   if ((old & SCREEN_HIDE_CURSOR) != (_flags & SCREEN_HIDE_CURSOR)) {
@@ -54,8 +51,8 @@ void CursesScreen::reset_flags(unsigned int flags) {
   std::cout << "CursesScreen#set_flags: " << flags << std::endl;
 }
 
-void CursesScreen::write(char32_t sym, Attr *attr) {
-  std::cout << "CursesScreen#write: " << sym << ", " << *attr << std::endl;
+void CursesScreen::print(char32_t sym, Attr *attr) {
+  std::cout << "CursesScreen#print: " << sym << ", " << *attr << std::endl;
 }
 void CursesScreen::newline() {
   std::cout << "CursesScreen#newline: " << std::endl;
@@ -130,6 +127,7 @@ void CursesScreen::tab_left(unsigned int num) {
 
 unsigned int CursesScreen::get_cursor_x() {
   std::cout << "CursesScreen#get_cursor_x: " << std::endl;
+  
   return 1;
 }
 unsigned int CursesScreen::get_cursor_y() {
@@ -161,6 +159,10 @@ void CursesScreen::erase_chars(unsigned int num) {
 
 void CursesScreen::set_margins(unsigned int top, unsigned int bottom) {
   std::cout << "CursesScreen#set_margins: " << top << ", " << bottom << std::endl;
+}
+
+void CursesScreen::write(char c) {
+  std::cout << "CursesScreen#write: " << c << std::endl;
 }
 
 } // namespace screen

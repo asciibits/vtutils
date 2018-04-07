@@ -1,6 +1,7 @@
 #ifndef VTUTILS_DEBUG_SCREEN_H_
 #define VTUTILS_DEBUG_SCREEN_H_
 
+#include <iostream>
 #include "config.h"
 #include "screen.h"
 
@@ -9,13 +10,16 @@ namespace screen {
 
 class DebugScreen : public Screen {
 public:
+  DebugScreen(std::ostream &out) : _out(out) { }
+  DebugScreen() : DebugScreen(std::cout) { }
+  
   void reset() override;
   void hard_reset() override;
 
   void set_flags(unsigned int flags) override;
   void reset_flags(unsigned int flags) override;
 
-  void write(char32_t sym, Attr *attr) override;
+  void print(char32_t sym, Attr *attr) override;
   void newline() override;
   void insert_lines(unsigned int num) override;
   void delete_lines(unsigned int num) override;
@@ -54,6 +58,11 @@ public:
   void erase_chars(unsigned int num) override;
   
   void set_margins(unsigned int top, unsigned int bottom) override;
+
+  void write(char sym) override;
+  
+private:
+  std::ostream &_out;
 };
 
 } // namespace screen

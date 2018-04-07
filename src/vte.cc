@@ -1522,6 +1522,13 @@ void Vte::write(const std::string u8) {
     input(u8);
   }
 
+  if (_flags & FLAG_PREPEND_ESCAPE) {
+    _screen.write('\033');
+  }
+  for (const char &c : u8) {
+    _screen.write(c);
+  }
+
   _flags &= ~FLAG_PREPEND_ESCAPE;
 }
 
@@ -1562,7 +1569,7 @@ char32_t Vte::map_char(char32_t val) {
 
 // write to console
 void Vte::write_console(char32_t sym) {
-  _screen.write(sym, &_attr);
+  _screen.print(sym, &_attr);
 }
 
 void Vte::reset() {

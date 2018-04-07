@@ -50,4 +50,5 @@ bin/
 
 # IDE files
 nbproject/
+*.kdev4
 
