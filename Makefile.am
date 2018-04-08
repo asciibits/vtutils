@@ -1,8 +1,11 @@
 AUTOMAKE_OPTIONS = foreign
 
-AM_CXXFLAGS = -std=c++11 -g -O0 -Wall
-#CXX = clang++
-#CXX = g++
+AM_CXXFLAGS = -std=c++11 -Wall
+if DEBUG
+AM_CXXFLAGS += -g -O0
+else
+AM_CXXFLAGS += -O2
+endif
 
 lib_LIBRARIES = lib/libvte.a lib/libdebugscreen.a lib/libcursesscreen.a
 lib_libvte_a_SOURCES = src/vte.cc src/screen.cc src/unicode.cc
