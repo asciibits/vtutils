@@ -18,7 +18,6 @@
 namespace vtutils {
 namespace vte {
 
-namespace {
 /**
  * Logging Callback
  *
@@ -114,8 +113,6 @@ struct saved_state {
   bool wrap_mode;
   bool origin_mode;
 };
-
-}
 
 // The Virtual Terminal Emulator. This class was ported from the C code at the libtsm project
 // ( https://www.freedesktop.org/wiki/Software/kmscon/libtsm/ )

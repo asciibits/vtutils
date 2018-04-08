@@ -6,14 +6,12 @@
 namespace vtutils {
 namespace unicode {
 
-namespace {
 enum utf8_parse_state {
 	UTF8_START,
 	UTF8_EXPECT1,
 	UTF8_EXPECT2,
 	UTF8_EXPECT3,
 };
-}
 
 /*
  * UTF8 State Machine

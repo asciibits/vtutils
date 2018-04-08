@@ -3,11 +3,14 @@
 
 AC_PREREQ([2.69])
 AC_INIT(vtutils, 0.1)
+PKG_CHECK_MODULES([curses], [${CURSESLIB:-ncursesw}] >= 6.0)
 AC_CONFIG_SRCDIR([src/vte.cc])
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
+: ${CFLAGS=""}
+: ${CXXFLAGS=""}
 AC_PROG_CXX
 AC_PROG_CC
 
