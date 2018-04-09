@@ -1,6 +1,7 @@
 #include "curses_screen.h"
 
 #include <iostream>
+#include "unicode.h"
 
 namespace vtutils {
 namespace screen {
@@ -51,9 +52,15 @@ void CursesScreen::reset_flags(unsigned int flags) {
 }
 
 void CursesScreen::print(char32_t sym, Attr *attr) {
-
+  char u8[4];
+  for (int i = 0; i < unicode::Utf8To32Converter::reverse(u8, sym); i++) {
+    if (wechochar(_win, u8[i]) != OK) {
+      _out << "Error writing symbol to screen";
+    }
+  }
   _super::print(sym, attr);
 }
+
 // void CursesScreen::newline() {
 //   std::cout << "CursesScreen#newline: " << std::endl;
 // }

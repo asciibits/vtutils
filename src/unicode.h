@@ -51,6 +51,8 @@ public:
   // Reset the state of this converter
   void reset();
 
+  static size_t reverse(char* out, char32_t code_point);
+
 private:
   utf8_parse_state _state = UTF8_START;
   char32_t _code_point = 0;

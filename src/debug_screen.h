@@ -81,8 +81,9 @@ public:
     }
     return _class_name;
   }
-private:
+protected:
   std::ostream &_out;
+private:
   std::string _class_name;
 };
 

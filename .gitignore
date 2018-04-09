@@ -52,5 +52,5 @@ autoscan.log
 # IDE files
 nbproject/
 *.kdev4
-*.swp
+*swp
 

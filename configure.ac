@@ -17,7 +17,6 @@ AS_IF(
     [test "x${enable_widechar}" = "xyes"],
     [PKG_CHECK_MODULES([curses], [ncursesw] >= 6.0)],
     [PKG_CHECK_MODULES([curses], [ncurses] >= 6.0)])
-#PKG_CHECK_MODULES([curses], [ncursesw] >= 6.0)
 
 # define a "--[en|dis]able-debug" flag
 AC_ARG_ENABLE(
@@ -30,8 +29,6 @@ AM_CONDITIONAL([DEBUG],[test "x${enable_debug}" = "xyes"])
 
 AC_CONFIG_SRCDIR([src/vte.cc])
 AM_INIT_AUTOMAKE([subdir-objects])
-
-#AM_CONDITIONAL([CXXDEBUG],[test "x
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.

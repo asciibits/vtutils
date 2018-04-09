@@ -36,6 +36,7 @@ void log(
 }
 
 WINDOW* do_curses() {
+  setlocale(LC_ALL, "");
   initscr();
   raw();
   noecho();
@@ -57,7 +58,9 @@ int main() {
 //  istringstream("\xf6\xa4\x13""asdf\n") >> vte;
 ////  istringstream(U"ᚳ᛫ᛗᛁᚳᛚ\n") >> vte;
 
-  std::cin >> vte;
+  // open a named pipe for stdin
+  std::ifstream("/home/lsanderson/from_screen") >> vte;
   
+  err << "Done!\n";
   return 0;
 }
