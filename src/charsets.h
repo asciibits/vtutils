@@ -1,6 +1,7 @@
 #ifndef VTUTILS_CHARSETS_H_
 #define VTUTILS_CHARSETS_H_
 
+#include <uchar.h>
 /*
  * VTE Character Sets
  * These are predefined charactersets that can be loaded into GL and GR. By

@@ -3,9 +3,10 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <stdexcept>
 #include <iostream>
 #include <memory>
+#include <stdarg.h>
+#include <stdexcept>
 #include <string>
 
 #include "charsets.h"
@@ -17,7 +18,6 @@
 namespace vtutils {
 namespace vte {
 
-namespace {
 enum LogLevel {
   LOG_TRACE = 1,
   LOG_INFO,
@@ -133,8 +133,6 @@ struct saved_state {
   bool wrap_mode;
   bool origin_mode;
 };
-
-}
 
 // The Virtual Terminal Emulator. This class was ported from the C code at the libtsm project
 // ( https://www.freedesktop.org/wiki/Software/kmscon/libtsm/ )

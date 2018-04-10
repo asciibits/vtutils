@@ -2,14 +2,19 @@
 #include <cstdlib>
 #include <ostream>
 #include <iomanip>
+#include <fstream>
 #include <sstream>
 #include <bits/stdio2.h>
+#include <ncurses.h>
 
 #include "vte.h"
 #include "debug_screen.h"
+#include "curses_screen.h"
 
 using namespace vtutils::screen;
 using namespace vtutils::vte;
+
+static std::ofstream err("/home/lsanderson/err.out");
 
 const std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
 typedef std::chrono::duration<double> seconds_t;
@@ -32,28 +37,42 @@ void log(
 
   switch (level) {
     case LOG_TRACE:
-      std::cerr << green;
+      err << green;
       break;
     case LOG_INFO:
-      std::cerr << blue;
+      err << blue;
       break;
     case LOG_WARN:
-      std::cerr << yellow;
+      err << yellow;
       break;
     case LOG_ERROR:
-      std::cerr << red;
+      err << red;
       break;
   }
   
-  std::cerr << std::setw(13) << std::fixed << std::right << d.count() << std::setw(0) << black << " ";
-  std::cerr << file << '#' << func << '[' << line << "]: " << std::flush;
-  std::vfprintf(stderr, format.c_str(), args);
-  fflush(stderr);
-  std::cerr << std::endl;
+  err << std::setw(13) << std::fixed << std::right << d.count() << std::setw(0) << black << " ";
+  err << file << '#' << func << '[' << line << "]: " << std::flush;
+  char buf[256];
+  std::vsnprintf(buf, 255, format.c_str(), args);
+  err << std::string(buf) << std::endl;
 }
+
+WINDOW* do_curses() {
+  setlocale(LC_ALL, "");
+  initscr();
+  raw();
+  noecho();
+  WINDOW *window = newwin(0, 0, 0, 0);
+  wprintw(window, "Hello World !!!");
+  wrefresh(window);
+  return window;
+}
+
 int main() {
-  std::cout << "In main!" << std::endl;
-  DebugScreen test_screen;
+  err << "In main!" << std::endl;
+
+  WINDOW *window = do_curses();
+  CursesScreen test_screen(window, err);
 
   Vte vte{test_screen, log};
 //  istringstream("tester\n") >> vte;
@@ -61,7 +80,7 @@ int main() {
 //  istringstream("\xf6\xa4\x13""asdf\n") >> vte;
 ////  istringstream(U"ᚳ᛫ᛗᛁᚳᛚ\n") >> vte;
 
-  std::cin >> vte;
-
+  std::ifstream("/home/lsanderson/from_screen") >> vte;
+  err << "Done!\n";
   return 0;
 }

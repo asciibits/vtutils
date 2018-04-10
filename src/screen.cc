@@ -4,7 +4,7 @@ namespace vtutils {
 namespace screen {
   
 std::ostream& operator<<(std::ostream &out, const Color &color) {
-  if (color.color_code != COLOR_RGB) {
+  if (color.color_code != COLOR_CODE_RGB) {
     out << "code:" << int(color.color_code);
   } else {
     out << "rgb[r:" << int(color.r)

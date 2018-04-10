@@ -47,7 +47,10 @@ missing
 .dirstamp
 lib/
 bin/
+autoscan.log
 
 # IDE files
 nbproject/
+*.kdev4
+*swp
 

@@ -80,5 +80,43 @@ void Utf8To32Converter::reset() {
   _code_point = 0;
 }
 
+size_t Utf8To32Converter::reverse(char* out, char32_t code_point) {
+  int len = 0;
+  if (code_point >= 0x80) {
+    if (code_point >= 0x800) {
+      // filter out several invalid encodings
+      if (code_point >= 0x110000                             // Outside unicode range
+          || (code_point >= 0xfdd0 && code_point < 0xfdf0)   // Unicode "noncharacter"
+          || (code_point & 0xfffe) == 0xfffe                 // More "noncharacters"
+          || (code_point >= 0xd800 && code_point < 0xe000)) {// UTF-16 surrogate pairs
+        // Write the UTF replacement character U+FFFD
+        out[0] = 0xef;
+        out[1] = 0xbf;
+        out[2] = 0xbd;
+        return 3;
+      }
+      if (code_point >= 0x10000) {
+        // 4-byte encoding - first, encode bits 18-20
+        out[len++] = 0xf0 | (0x07 & code_point >> 18);
+        // next, bits 12-17
+        out[len++] = 0x08 | (0x3f & code_point >> 12);
+      } else {
+        // 3-byte encoding - first, encode bits 12-15
+        out[len++] = 0xe0 | (0x0f & code_point >> 12);
+      }
+      // next, bits 6-11
+      out[len++] = 0x08 | (0x3f & code_point >> 6);
+    } else {
+      // 2-byte encoding - first, encode bits 6-10
+      out[len++] = 0xc0 | (0x1f & code_point >> 6);
+    }
+    // next, bits 0-5
+    out[len++] = 0x08 | (0x3f & code_point);
+  } else {
+    out[len++] = code_point;
+  }
+  return len;
+}
+
 } // end namespace vtutils
 } // end namespace unicode

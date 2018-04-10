@@ -3,19 +3,15 @@
 
 #include <memory>
 
-#include "config.h"
-
 namespace vtutils {
 namespace unicode {
 
-namespace {
 enum utf8_parse_state {
 	UTF8_START,
 	UTF8_EXPECT1,
 	UTF8_EXPECT2,
 	UTF8_EXPECT3,
 };
-}
 
 /*
  * UTF8 State Machine
@@ -54,6 +50,8 @@ public:
   
   // Reset the state of this converter
   void reset();
+
+  static size_t reverse(char* out, char32_t code_point);
 
 private:
   utf8_parse_state _state = UTF8_START;
