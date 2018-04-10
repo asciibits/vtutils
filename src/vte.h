@@ -18,6 +18,13 @@ namespace vtutils {
 namespace vte {
 
 namespace {
+enum LogLevel {
+  LOG_TRACE = 1,
+  LOG_INFO,
+  LOG_WARN,
+  LOG_ERROR
+};
+
 /**
  * Logging Callback
  *
@@ -35,6 +42,7 @@ typedef void (*log_cb) (
     std::string file,
     int line,
     std::string func,
+    LogLevel level,
     std::string format,
     va_list args);
 
@@ -43,23 +51,35 @@ void log_format(log_cb logger,
         std::string file,
         int line,
         std::string func,
+        LogLevel level,
         std::string format,
         ...) {
   va_list list;
   if (logger) {
     va_start(list, format);
-    logger(file, line, func, format, list);
+    logger(file, line, func, level, format, list);
     va_end(list);
   }
 }
 
 #define LOG_DEFAULT __FILE__, __LINE__, __func__
 
-#define log_printf(obj, format, ...) \
+#define log_trace(obj, format, ...) \
+    log_printf((obj), (LOG_TRACE), (format), ##__VA_ARGS__)
+
+#define log_info(obj, format, ...) \
+    log_printf((obj), (LOG_INFO), (format), ##__VA_ARGS__)
+
+#define log_warn(obj, format, ...) \
+    log_printf((obj), (LOG_WARN), (format), ##__VA_ARGS__)
+
+#define log_printf(obj, level, format, ...) \
     log_format((obj)->_logger, \
             LOG_DEFAULT, \
+            (level), \
             (format), \
             ##__VA_ARGS__)
+
 
 
 // Input parser states

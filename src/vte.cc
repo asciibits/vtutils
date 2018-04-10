@@ -33,21 +33,21 @@ namespace {
 // entry actions to be performed when entering the selected state
 static ParserAction entry_action(ParserState parser_state) {
   switch (parser_state) {
-	case STATE_CSI_ENTRY: return ACTION_CLEAR;
-	case STATE_DCS_ENTRY: return ACTION_CLEAR;
-	case STATE_DCS_PASS: return ACTION_DCS_START;
-	case STATE_ESC: return ACTION_CLEAR;
-	case STATE_OSC_STRING: return ACTION_OSC_START;
-	default: return ACTION_NONE;
+    case STATE_CSI_ENTRY: return ACTION_CLEAR;
+    case STATE_DCS_ENTRY: return ACTION_CLEAR;
+    case STATE_DCS_PASS: return ACTION_DCS_START;
+    case STATE_ESC: return ACTION_CLEAR;
+    case STATE_OSC_STRING: return ACTION_OSC_START;
+    default: return ACTION_NONE;
   }
 }
 
 // exit actions to be performed when leaving the selected state
 static ParserAction exit_action(ParserState parser_state) {
   switch (parser_state) {
-	case STATE_DCS_PASS: return ACTION_DCS_END;
-	case STATE_OSC_STRING: return ACTION_OSC_END;
-	default: return ACTION_NONE;
+    case STATE_DCS_PASS: return ACTION_DCS_END;
+    case STATE_OSC_STRING: return ACTION_OSC_END;
+    default: return ACTION_NONE;
   }
 }
 
@@ -118,7 +118,7 @@ void Vte::input(std::string s) {
 }
 
 void Vte::input(char c) {
-  log_printf(
+  log_trace(
     this,
     "processing char: %c",
     c);
@@ -126,7 +126,7 @@ void Vte::input(char c) {
   ++_parse_cnt;
   if (_flags & FLAG_7BIT_MODE) {
     if ((c & 0x80) != 0) {
-      log_printf(
+      log_warn(
           this,
           "receiving 8bit character U+%d from pty while in 7bit mode",
           (int) c);
@@ -382,7 +382,7 @@ void Vte::parse_data(char32_t raw) {
       // do nothing
       ;
   }
-  log_printf(this, "unhandled input %u in state %d", raw, _state);
+  log_warn(this, "unhandled input %u in state %d", raw, _state);
 }
 
 // perform state transition and dispatch related actions
@@ -444,7 +444,7 @@ void Vte::do_action(char32_t data, ParserAction action) {
     case ACTION_OSC_END:
       break;
     default:
-      log_printf(this, "invalid action %d", action);
+      log_warn(this, "invalid action %d", action);
   }
 }
 
@@ -548,7 +548,7 @@ void Vte::do_execute(char32_t ctrl) {
       // nothing to do here
       break;
     default:
-      log_printf(this, "unhandled control char %u", ctrl);
+      log_warn(this, "unhandled control char %u", ctrl);
   }
 }
 
@@ -712,7 +712,7 @@ void Vte::do_esc(char32_t data) {
 
   // everything below is only valid without CSI flags
   if (_csi_flags) {
-    log_printf(this, "unhandled escape seq %u", data);
+    log_warn(this, "unhandled escape seq %u", data);
     return;
   }
 
@@ -790,7 +790,7 @@ void Vte::do_esc(char32_t data) {
       restore_state();
       break;
     default:
-      log_printf(this, "unhandled escape seq %u", data);
+      log_warn(this, "unhandled escape seq %u", data);
   }
 }
 
@@ -879,7 +879,7 @@ void Vte::do_csi(char32_t data) {
       else if (_csi_argv[0] == 2)
         _screen.erase_screen(protect);
       else
-        log_printf(this, "unknown parameter to CSI-J: %d", _csi_argv[0]);
+        log_warn(this, "unknown parameter to CSI-J: %d", _csi_argv[0]);
       break;
     case 'K':
       if (_csi_flags & CSI_WHAT)
@@ -894,7 +894,7 @@ void Vte::do_csi(char32_t data) {
       else if (_csi_argv[0] == 2)
         _screen.erase_current_line(protect);
       else
-        log_printf(this, "unknown parameter to CSI-K: %d", _csi_argv[0]);
+        log_warn(this, "unknown parameter to CSI-K: %d", _csi_argv[0]);
       break;
     case 'X': // ECH
       // erase characters
@@ -968,7 +968,7 @@ void Vte::do_csi(char32_t data) {
       } else if (num == 3) {
         _screen.reset_all_tabstops();
       } else {
-        log_printf(this, "invalid parameter %d to TBC CSI", num);
+        log_warn(this, "invalid parameter %d to TBC CSI", num);
       }
       break;
     case '@': // ICH
@@ -1018,7 +1018,7 @@ void Vte::do_csi(char32_t data) {
       _screen.scroll_down(num);
       break;
       default:
-        log_printf(this, "unhandled CSI sequence %c", data);
+        log_warn(this, "unhandled CSI sequence %c", data);
   }
 }
 
@@ -1174,7 +1174,7 @@ void Vte::csi_attribute() {
         if (i + 2 >= _csi_argc ||
             _csi_argv[i + 1] != 5 ||
             _csi_argv[i + 2] < 0) {
-            log_printf(this, "invalid 256color SGR");
+            log_warn(this, "invalid 256color SGR");
           break;
         }
 
@@ -1220,7 +1220,7 @@ void Vte::csi_attribute() {
         i += 2;
         break;
       default:
-        log_printf(this, "unhandled SGR attr %i", _csi_argv[i]);
+        log_warn(this, "unhandled SGR attr %i", _csi_argv[i]);
     }
   }
 
@@ -1268,7 +1268,7 @@ void Vte::csi_compat_mode() {
     _g0 = &charsets::unicode_lower;
     _g1 = &charsets::dec_supplemental_graphics;
   } else {
-    log_printf(
+    log_warn(
         this,
         "unhandled DECSCL 'p' CSI %i, switching to utf-8 mode again",
         _csi_argv[0]);
@@ -1301,7 +1301,7 @@ void Vte::csi_mode(bool set) {
           set_reset_flag(set, FLAG_LINE_FEED_NEW_LINE_MODE);
           continue;
         default:
-          log_printf(this, "unknown non-DEC (Re)Set-Mode %d", _csi_argv[i]);
+          log_warn(this, "unknown non-DEC (Re)Set-Mode %d", _csi_argv[i]);
           continue;
       }
     }
@@ -1448,7 +1448,7 @@ void Vte::csi_mode(bool set) {
         }
         continue;
       default:
-        log_printf(
+        log_warn(
             this,
             "unknown DEC %set-Mode %d",
             set ? "S" : "Res",
@@ -1468,7 +1468,7 @@ void Vte::csi_dev_attr() {
       return;
     }
   }
-  log_printf(
+  log_warn(
       this,
       "unhandled DA: %x %d %d %d...",
       _csi_flags,
@@ -1501,17 +1501,17 @@ void Vte::send_primary_da() {
 
 void Vte::write(const std::string u8) {
 //#ifdef BUILD_ENABLE_DEBUG
-//	// in debug mode we check that escape sequences are always <0x7f so they
-//	 * are correctly parsed by non-unicode and non-8bit-mode clients.
-//	size_t i;
+//    // in debug mode we check that escape sequences are always <0x7f so they
+//    * are correctly parsed by non-unicode and non-8bit-mode clients.
+//    size_t i;
 //
-//	if (!raw) {
-//		for (i = 0; i < len; ++i) {
-//			if (u8[i] & 0x80)
-//				llog_warning(vte, "sending 8bit character inline to client in %s:%d",
-//					     file, line);
-//		}
-//	}
+//    if (!raw) {
+//    for (i = 0; i < len; ++i) {
+//    if (u8[i] & 0x80)
+//    llog_warning(vte, "sending 8bit character inline to client in %s:%d",
+//    file, line);
+//    }
+//    }
 //#endif
 
   // in local echo mode, directly parse the data again
@@ -1625,28 +1625,28 @@ bool Vte::set_charset(charsets::charset *set) {
 }
 
 void Vte::reset_state() {
-	_saved_state.cursor_x = 0;
-	_saved_state.cursor_y = 0;
-	_saved_state.origin_mode = false;
-	_saved_state.wrap_mode = true;
-	_saved_state.gl = _g0;
-	_saved_state.gr = _g1;
-	_saved_state.attr = _screen.default_attr();
-	_saved_state.attr.blink = false;
-	_saved_state.attr.bold = false;
-	_saved_state.attr.inverse = false;
-	_saved_state.attr.protect = false;
-	_saved_state.attr.underline = false;
+  _saved_state.cursor_x = 0;
+  _saved_state.cursor_y = 0;
+  _saved_state.origin_mode = false;
+  _saved_state.wrap_mode = true;
+  _saved_state.gl = _g0;
+  _saved_state.gr = _g1;
+  _saved_state.attr = _screen.default_attr();
+  _saved_state.attr.blink = false;
+  _saved_state.attr.bold = false;
+  _saved_state.attr.inverse = false;
+  _saved_state.attr.protect = false;
+  _saved_state.attr.underline = false;
 }
 
 void Vte::save_state() {
-	_saved_state.cursor_x = _screen.get_cursor_x();
-	_saved_state.cursor_y = _screen.get_cursor_y();
-	_saved_state.attr = _attr;
-	_saved_state.gl = _gl;
-	_saved_state.gr = _gr;
-	_saved_state.wrap_mode = _flags & FLAG_AUTO_WRAP_MODE;
-	_saved_state.origin_mode = _flags & FLAG_ORIGIN_MODE;
+  _saved_state.cursor_x = _screen.get_cursor_x();
+  _saved_state.cursor_y = _screen.get_cursor_y();
+  _saved_state.attr = _attr;
+  _saved_state.gl = _gl;
+  _saved_state.gr = _gr;
+  _saved_state.wrap_mode = _flags & FLAG_AUTO_WRAP_MODE;
+  _saved_state.origin_mode = _flags & FLAG_ORIGIN_MODE;
 }
 
 void Vte::restore_state() {
