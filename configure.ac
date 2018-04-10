@@ -4,6 +4,12 @@
 AC_PREREQ([2.69])
 AC_INIT(vtutils, 0.1)
 
+# Make sure pkg-config is installed
+AC_CHECK_PROG(PKG_CONFIG_CHECK, pkg-config, yes)
+if test x"$PKG_CONFIG_CHECK" != x"yes"; then
+  AC_MSG_ERROR([Please install pkg-config before installing.])
+fi
+
 # define a "--[en|dis]able-widechar" flag
 AC_ARG_ENABLE(
     [widechar],
